@@ -198,4 +198,3 @@ extension GalleryViewController: UICollectionViewDelegateFlowLayout {
         return CGSize(width: width, height: width)
     }
 }
-

@@ -75,4 +75,3 @@ final class GalleryCollectionViewCell: UICollectionViewCell {
         favoriteIndicator.isHidden = true
     }
 }
-

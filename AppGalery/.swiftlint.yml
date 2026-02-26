@@ -1,0 +1,11 @@
+disabled_rules:
+  - force_cast
+  - trailing_whitespace
+  - unused_optional_binding
+  - multiple_closures_with_trailing_closure
+
+opt_in_rules: []
+
+line_length:
+  warning: 140
+  error: 200

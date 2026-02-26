@@ -64,4 +64,3 @@ final class PhotoDetailViewModel {
         return displayFormatter.string(from: date)
     }
 }
-

@@ -162,4 +162,3 @@ final class PhotoDetailViewController: UIViewController {
 extension PhotoDetailViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? { imageView }
 }
-

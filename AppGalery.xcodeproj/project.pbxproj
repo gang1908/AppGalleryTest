@@ -14,6 +14,7 @@
 		6A8552FF2F44D4D300C846BE /* Exceptions for "AppGalery" folder in "AppGalery" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				.swiftlint.yml,
 				Info.plist,
 			);
 			target = 6A8552EC2F44D4D200C846BE /* AppGalery */;
@@ -72,6 +73,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				6A288DAA2F50C854009D4565 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				6A8552EF2F44D4D200C846BE /* AppGalery */,
@@ -107,6 +109,9 @@
 			);
 			mainGroup = 6A8552E42F44D4D200C846BE;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6A288DA82F50C7D7009D4565 /* XCRemoteSwiftPackageReference "SwiftLint" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6A8552EE2F44D4D200C846BE /* Products */;
 			projectDirPath = "";
@@ -136,6 +141,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6A288DAA2F50C854009D4565 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 6A288DA92F50C854009D4565 /* SwiftLintBuildToolPlugin */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		6A8553012F44D4D300C846BE /* Debug */ = {
@@ -345,6 +357,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6A288DA82F50C7D7009D4565 /* XCRemoteSwiftPackageReference "SwiftLint" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/SwiftLint";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.63.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6A288DA92F50C854009D4565 /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6A288DA82F50C7D7009D4565 /* XCRemoteSwiftPackageReference "SwiftLint" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6A8552E52F44D4D200C846BE /* Project object */;
 }
