@@ -37,10 +37,10 @@ final class GalleryViewModel {
         guard !isLoading else { return }
         isLoading = true
         didStartLoading?()
-
+        
         service.fetchPhotos(page: page) { [weak self] result in
             guard let self else { return }
-
+            
             DispatchQueue.main.async {
                 self.isLoading = false
                 switch result {
@@ -52,8 +52,21 @@ final class GalleryViewModel {
                     switch error {
                     case .missingAccessKey:
                         self.didFail?("Не найден UNSPLASH_ACCESS_KEY. Добавь ключ в Info.plist (см. README).")
-                    default:
-                        self.didFail?("Не удалось загрузить фотографии")
+                        
+                    case .unauthorized:
+                        self.didFail?("Ключ Unsplash неверный или нет доступа (401/403). Проверь UNSPLASH_ACCESS_KEY в Info.plist.")
+                        
+                    case .rateLimited:
+                        self.didFail?("Слишком много запросов (429). Попробуй чуть позже.")
+                        
+                    case .invalidURL:
+                        self.didFail?("Ошибка формирования запроса. Попробуй перезапустить приложение.")
+                        
+                    case .decoding:
+                        self.didFail?("Не удалось обработать ответ сервера.")
+                        
+                    case .network:
+                        self.didFail?("Проблема с сетью. Проверь интернет и попробуй снова.")
                     }
                 }
             }
