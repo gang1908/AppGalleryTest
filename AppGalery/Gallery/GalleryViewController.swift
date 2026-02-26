@@ -141,22 +141,21 @@ extension GalleryViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        guard
-            let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: GalleryCollectionViewCell.identifier,
-                for: indexPath
-            ) as? GalleryCollectionViewCell,
-            let photo = viewModel.photo(at: indexPath.item)
-        else {
-            return UICollectionViewCell()
+
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: GalleryCollectionViewCell.identifier,
+            for: indexPath
+        ) as! GalleryCollectionViewCell
+
+        if let photo = viewModel.photo(at: indexPath.item) {
+            cell.configure(
+                with: photo,
+                isFavorite: viewModel.isFavorite(photoId: photo.id)
+            )
+        } else {
+            cell.prepareForReuse()
         }
-        
-        cell.configure(
-            with: photo,
-            isFavorite: viewModel.isFavorite(photoId: photo.id)
-        )
-        
+
         return cell
     }
 }

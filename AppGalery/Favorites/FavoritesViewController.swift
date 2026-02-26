@@ -70,16 +70,17 @@ extension FavoritesViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        guard let cell = collectionView.dequeueReusableCell(
+
+        let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: GalleryCollectionViewCell.identifier,
             for: indexPath
-        ) as? GalleryCollectionViewCell,
-              let photo = viewModel.photo(at: indexPath.item) else {
-            return UICollectionViewCell()
+        ) as! GalleryCollectionViewCell
+
+        if let photo = viewModel.photo(at: indexPath.item) {
+            cell.configure(with: photo, isFavorite: true)
+        } else {
+            cell.prepareForReuse()
         }
-        
-        cell.configure(with: photo, isFavorite: true)
         return cell
     }
 }
