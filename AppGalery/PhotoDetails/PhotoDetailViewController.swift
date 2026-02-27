@@ -154,8 +154,11 @@ final class PhotoDetailViewController: UIViewController {
     @objc private func favoriteTapped() { viewModel.toggleFavorite() }
     
     @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
-        if gesture.direction == .left { _ = viewModel.nextPhoto() }
-        else if gesture.direction == .right { _ = viewModel.previousPhoto() }
+        if gesture.direction == .left {
+            _ = viewModel.nextPhoto()
+        } else if gesture.direction == .right {
+            _ = viewModel.previousPhoto()
+        }
     }
 }
 

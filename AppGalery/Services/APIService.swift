@@ -26,75 +26,103 @@ final class APIService {
         return trimmed.isEmpty ? nil : trimmed
     }
 
-    func fetchPhotos(page: Int, completion: @escaping (Result<[Photo], PhotoError>) -> Void) {
+    func fetchPhotos(
+        page: Int,
+        completion: @escaping (Result<[Photo], PhotoError>) -> Void
+    ) {
         guard let accessKey else {
             completion(.failure(.missingAccessKey))
             return
         }
 
-        guard let url = URL(string: "https://api.unsplash.com/photos?page=\(page)&per_page=30") else {
+        guard let request = buildRequest(page: page, accessKey: accessKey) else {
             completion(.failure(.invalidURL))
             return
         }
 
-        var request = URLRequest(url: url)
-        request.setValue("Client-ID \(accessKey)", forHTTPHeaderField: "Authorization")
+        session.dataTask(with: request) { [weak self] data, response, error in
+            guard let self else { return }
 
-        session.dataTask(with: request) { data, response, error in
-            if error != nil {
-                completion(.failure(.network))
-                return
-            }
-
-            guard let http = response as? HTTPURLResponse else {
-                completion(.failure(.network))
-                return
-            }
-
-            switch http.statusCode {
-            case 200...299:
-                break
-            case 401, 403:
-                completion(.failure(.unauthorized))
-                return
-            case 429:
-                completion(.failure(.rateLimited))
-                return
-            default:
-                completion(.failure(.network))
-                return
-            }
-
-            guard let data else {
-                completion(.failure(.network))
-                return
-            }
-
-            do {
-                let dto = try JSONDecoder().decode([UnsplashPhotoDTO].self, from: data)
-                let photos = dto.map { item in
-                    Photo(
-                        id: item.id,
-                        urls: PhotoURLs(
-                            raw: item.urls.raw,
-                            full: item.urls.full,
-                            regular: item.urls.regular,
-                            small: item.urls.small,
-                            thumb: item.urls.thumb
-                        ),
-                        user: PhotoUser(
-                            name: item.user.name,
-                            username: item.user.username ?? ""
-                        ),
-                        description: item.description,
-                        altDescription: item.altDescription,
-                        createdAt: item.createdAt
-                    )
-                }
-                completion(.success(photos))
-            } catch {
-                completion(.failure(.decoding))
-            }
+            let result = self.processResponse(data: data,
+                                              response: response,
+                                              error: error)
+            completion(result)
         }.resume()
+    }
+    
+    private func buildRequest(page: Int, accessKey: String) -> URLRequest? {
+        guard let url = URL(
+            string: "https://api.unsplash.com/photos?page=\(page)&per_page=30"
+        ) else {
+            return nil
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue("Client-ID \(accessKey)",
+                         forHTTPHeaderField: "Authorization")
+
+        return request
+    }
+    
+    private func processResponse(
+        data: Data?,
+        response: URLResponse?,
+        error: Error?
+    ) -> Result<[Photo], PhotoError> {
+
+        if error != nil {
+            return .failure(.network)
+        }
+
+        guard let http = response as? HTTPURLResponse else {
+            return .failure(.network)
+        }
+
+        switch http.statusCode {
+        case 200...299:
+            break
+        case 401, 403:
+            return .failure(.unauthorized)
+        case 429:
+            return .failure(.rateLimited)
+        default:
+            return .failure(.network)
+        }
+
+        guard let data else {
+            return .failure(.network)
+        }
+
+        return decodePhotos(from: data)
+    }
+    
+    private func decodePhotos(from data: Data) -> Result<[Photo], PhotoError> {
+        do {
+            let dto = try JSONDecoder().decode([UnsplashPhotoDTO].self, from: data)
+
+            let photos = dto.map { item in
+                Photo(
+                    id: item.id,
+                    urls: PhotoURLs(
+                        raw: item.urls.raw,
+                        full: item.urls.full,
+                        regular: item.urls.regular,
+                        small: item.urls.small,
+                        thumb: item.urls.thumb
+                    ),
+                    user: PhotoUser(
+                        name: item.user.name,
+                        username: item.user.username ?? ""
+                    ),
+                    description: item.description,
+                    altDescription: item.altDescription,
+                    createdAt: item.createdAt
+                )
+            }
+
+            return .success(photos)
+        } catch {
+            return .failure(.decoding)
+        }
     }
 }

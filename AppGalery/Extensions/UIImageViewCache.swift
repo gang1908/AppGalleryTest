@@ -37,12 +37,21 @@ extension UIImageView {
 }
 
 private enum AssociatedKeys {
-    static var lastURL = "appgalery.lastRequestedURL"
+    static var lastURL: UInt8 = 0
 }
 
 private extension UIImageView {
     var lastRequestedURL: String? {
-        get { objc_getAssociatedObject(self, &AssociatedKeys.lastURL) as? String }
-        set { objc_setAssociatedObject(self, &AssociatedKeys.lastURL, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+        get {
+            objc_getAssociatedObject(self, &AssociatedKeys.lastURL) as? String
+        }
+        set {
+            objc_setAssociatedObject(
+                self,
+                &AssociatedKeys.lastURL,
+                newValue,
+                .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+            )
+        }
     }
 }

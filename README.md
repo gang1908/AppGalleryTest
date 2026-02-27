@@ -1,9 +1,9 @@
 # Gallery App (Intern test task)
 
 ## Контактная информация: 
-http://linkedin.com/in/angelina-golubovskaya-68b57131b
-https://github.com/gang1908
-+375297345858
+ - http://linkedin.com/in/angelina-golubovskaya-68b57131b
+ - https://github.com/gang1908
+ - +375297345858
 
 #О проекте
 
@@ -52,6 +52,10 @@ https://github.com/gang1908
 - URLSession
 - MVVM
 - UserDefaults
+
+## SwiftLint
+Для контроля качества кода используется SwiftLint (подключён через SPM как Build Tool Plugin).
+Конфигурация находится в .swiftlint.yml.
 
 ##Как запустить:
 
