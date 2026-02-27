@@ -21,9 +21,15 @@ final class APIService {
     private let session: URLSession = .shared
 
     private var accessKey: String? {
-        let value = Bundle.main.object(forInfoDictionaryKey: "UNSPLASH_ACCESS_KEY") as? String
-        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return trimmed.isEmpty ? nil : trimmed
+        let value = Bundle.main.object(
+            forInfoDictionaryKey: "UNSPLASH_ACCESS_KEY"
+        ) as? String
+
+        let trimmed = value?.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        return (trimmed?.isEmpty == false) ? trimmed : nil
     }
 
     func fetchPhotos(
@@ -43,13 +49,16 @@ final class APIService {
         session.dataTask(with: request) { [weak self] data, response, error in
             guard let self else { return }
 
-            let result = self.processResponse(data: data,
-                                              response: response,
-                                              error: error)
+            let result = self.handleResponse(
+                data: data,
+                response: response,
+                error: error
+            )
+
             completion(result)
         }.resume()
     }
-    
+
     private func buildRequest(page: Int, accessKey: String) -> URLRequest? {
         guard let url = URL(
             string: "https://api.unsplash.com/photos?page=\(page)&per_page=30"
@@ -58,26 +67,24 @@ final class APIService {
         }
 
         var request = URLRequest(url: url)
-        request.setValue("Client-ID \(accessKey)",
-                         forHTTPHeaderField: "Authorization")
-
+        request.setValue(
+            "Client-ID \(accessKey)",
+            forHTTPHeaderField: "Authorization"
+        )
         return request
     }
-    
-    private func processResponse(
+
+    private func handleResponse(
         data: Data?,
         response: URLResponse?,
         error: Error?
     ) -> Result<[Photo], PhotoError> {
-
         if error != nil {
             return .failure(.network)
         }
-
         guard let http = response as? HTTPURLResponse else {
             return .failure(.network)
         }
-
         switch http.statusCode {
         case 200...299:
             break
@@ -92,37 +99,41 @@ final class APIService {
         guard let data else {
             return .failure(.network)
         }
-
-        return decodePhotos(from: data)
+        return decode(data)
     }
-    
-    private func decodePhotos(from data: Data) -> Result<[Photo], PhotoError> {
-        do {
-            let dto = try JSONDecoder().decode([UnsplashPhotoDTO].self, from: data)
 
-            let photos = dto.map { item in
-                Photo(
-                    id: item.id,
-                    urls: PhotoURLs(
-                        raw: item.urls.raw,
-                        full: item.urls.full,
-                        regular: item.urls.regular,
-                        small: item.urls.small,
-                        thumb: item.urls.thumb
-                    ),
-                    user: PhotoUser(
-                        name: item.user.name,
-                        username: item.user.username ?? ""
-                    ),
-                    description: item.description,
-                    altDescription: item.altDescription,
-                    createdAt: item.createdAt
-                )
-            }
+    private func decode(_ data: Data) -> Result<[Photo], PhotoError> {
+        do {
+            let dto = try JSONDecoder().decode(
+                [UnsplashPhotoDTO].self,
+                from: data
+            )
+
+            let photos = dto.map(mapToDomain)
 
             return .success(photos)
         } catch {
             return .failure(.decoding)
         }
+    }
+
+    private func mapToDomain(_ item: UnsplashPhotoDTO) -> Photo {
+        Photo(
+            id: item.id,
+            urls: PhotoURLs(
+                raw: item.urls.raw,
+                full: item.urls.full,
+                regular: item.urls.regular,
+                small: item.urls.small,
+                thumb: item.urls.thumb
+            ),
+            user: PhotoUser(
+                name: item.user.name,
+                username: item.user.username ?? ""
+            ),
+            description: item.description,
+            altDescription: item.altDescription,
+            createdAt: item.createdAt
+        )
     }
 }
