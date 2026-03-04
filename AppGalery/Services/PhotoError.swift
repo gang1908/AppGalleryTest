@@ -16,23 +16,21 @@ enum PhotoError: Error {
     case decoding
 }
 
-extension PhotoError {
-    var message: String {
+extension PhotoError: LocalizedError {
+    var errorDescription: String? {
         switch self {
         case .missingAccessKey:
-            return
-                "Не найден UNSPLASH_ACCESS_KEY. Добавь ключ в Info.plist (см. README)."
+            return NSLocalizedString("error.missingKey", comment: "")
         case .unauthorized:
-            return
-                "Ключ Unsplash неверный или нет доступа (401/403). Проверь UNSPLASH_ACCESS_KEY."
+            return NSLocalizedString("error.unauthorized", comment: "")
         case .rateLimited:
-            return "Слишком много запросов (429). Попробуй чуть позже."
+            return NSLocalizedString("error.rateLimited", comment: "")
         case .invalidURL:
-            return "Ошибка формирования запроса."
+            return NSLocalizedString("error.invalidURL", comment: "")
         case .network:
-            return "Проблема с сетью. Проверь интернет и попробуй снова."
+            return NSLocalizedString("error.network", comment: "")
         case .decoding:
-            return "Не удалось обработать ответ сервера."
+            return NSLocalizedString("error.decoding", comment: "")
         }
     }
 }

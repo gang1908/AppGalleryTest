@@ -9,15 +9,24 @@ import UIKit
 
 final class ErrorView: UIView {
 
+    private enum Constants {
+        static let spacing: CGFloat = 16
+        static let sideInset: CGFloat = 32
+        static let iconSize: CGFloat = 60
+        static let buttonHeight: CGFloat = 44
+        static let buttonMinWidth: CGFloat = 140
+        static let cornerRadius: CGFloat = 8
+    }
+
     private let stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = 16
+        stackView.spacing = Constants.spacing
         stackView.alignment = .center
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
-    
+
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "exclamationmark.triangle")
@@ -26,20 +35,20 @@ final class ErrorView: UIView {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
-    
+
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ошибка загрузки"
+        label.text = L10n.errorTitle
         label.font = .systemFont(ofSize: 18, weight: .semibold)
         label.textColor = .label
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
+
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.text = "Не удалось загрузить данные"
+        label.text = L10n.errorDefaultMessage
         label.font = .systemFont(ofSize: 14)
         label.textColor = .secondaryLabel
         label.textAlignment = .center
@@ -47,24 +56,24 @@ final class ErrorView: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
+
     private let retryButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Повторить", for: .normal)
+        button.setTitle(L10n.retry, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .systemBlue
-        button.layer.cornerRadius = 8
+        button.layer.cornerRadius = Constants.cornerRadius
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
 
     var retryAction: (() -> Void)?
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupUI()
@@ -73,26 +82,26 @@ final class ErrorView: UIView {
     private func setupUI() {
         backgroundColor = .systemBackground
         translatesAutoresizingMaskIntoConstraints = false
-        
+
         addSubview(stackView)
         stackView.addArrangedSubview(imageView)
         stackView.addArrangedSubview(titleLabel)
         stackView.addArrangedSubview(messageLabel)
         stackView.addArrangedSubview(retryButton)
-        
+
         NSLayoutConstraint.activate([
             stackView.centerXAnchor.constraint(equalTo: centerXAnchor),
             stackView.centerYAnchor.constraint(equalTo: centerYAnchor),
-            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 32),
-            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32),
-            
-            imageView.widthAnchor.constraint(equalToConstant: 60),
-            imageView.heightAnchor.constraint(equalToConstant: 60),
-            
-            retryButton.heightAnchor.constraint(equalToConstant: 44),
-            retryButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 140)
+            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.sideInset),
+            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.sideInset),
+
+            imageView.widthAnchor.constraint(equalToConstant: Constants.iconSize),
+            imageView.heightAnchor.constraint(equalToConstant: Constants.iconSize),
+
+            retryButton.heightAnchor.constraint(equalToConstant: Constants.buttonHeight),
+            retryButton.widthAnchor.constraint(greaterThanOrEqualToConstant: Constants.buttonMinWidth)
         ])
-        
+
         retryButton.addTarget(self, action: #selector(retryTapped), for: .touchUpInside)
     }
 
