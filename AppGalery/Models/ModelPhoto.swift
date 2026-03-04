@@ -38,8 +38,6 @@ struct UnsplashPhotoUserDTO: Decodable {
     let username: String?
 }
 
-// MARK: - Domain
-
 struct Photo {
     let id: String
     let urls: PhotoURLs

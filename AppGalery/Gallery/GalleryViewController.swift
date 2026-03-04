@@ -66,8 +66,6 @@ final class GalleryViewController: UIViewController {
     }
 }
 
-// MARK: - UI
-
 private extension GalleryViewController {
 
     func setupUI() {
@@ -112,8 +110,6 @@ private extension GalleryViewController {
     }
 }
 
-// MARK: - Bindings
-
 private extension GalleryViewController {
 
     func setupBindings() {
@@ -145,8 +141,6 @@ private extension GalleryViewController {
     }
 }
 
-// MARK: - Actions
-
 private extension GalleryViewController {
 
     @objc func refreshData() {
@@ -163,8 +157,6 @@ private extension GalleryViewController {
         navigationController?.pushViewController(favoritesVC, animated: true)
     }
 }
-
-// MARK: - DataSource
 
 extension GalleryViewController: UICollectionViewDataSource {
 
@@ -200,8 +192,6 @@ extension GalleryViewController: UICollectionViewDataSource {
     }
 }
 
-// MARK: - Delegate
-
 extension GalleryViewController: UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -228,8 +218,6 @@ extension GalleryViewController: UICollectionViewDelegate {
     }
 }
 
-// MARK: - Layout
-
 extension GalleryViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(
@@ -243,8 +231,6 @@ extension GalleryViewController: UICollectionViewDelegateFlowLayout {
         return CGSize(width: width, height: width)
     }
 }
-
-// MARK: - Prefetch
 
 extension GalleryViewController: UICollectionViewDataSourcePrefetching {
 

@@ -1,6 +1,7 @@
 "gallery.title" = "Галерея";
 "favorites.title" = "Избранное";
 "details.title" = "Детали";
+"common.unknownAuthor" = "Неизвестный автор";
 
 "error.title" = "Ошибка загрузки";
 "error.defaultMessage" = "Не удалось загрузить данные";

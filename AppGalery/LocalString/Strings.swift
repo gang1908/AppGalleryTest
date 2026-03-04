@@ -11,6 +11,7 @@ enum L10n {
     static let galleryTitle = NSLocalizedString("gallery.title", comment: "")
     static let favoritesTitle = NSLocalizedString("favorites.title", comment: "")
     static let detailsTitle = NSLocalizedString("details.title", comment: "")
+    static let unknownAuthor = NSLocalizedString("common.unknownAuthor", comment: "")
 
     static let errorTitle = NSLocalizedString("error.title", comment: "")
     static let errorDefaultMessage = NSLocalizedString("error.defaultMessage", comment: "")

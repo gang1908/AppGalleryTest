@@ -77,8 +77,6 @@ final class FavoritesViewController: UIViewController {
     }
 }
 
-// MARK: - DataSource
-
 extension FavoritesViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -108,13 +106,10 @@ extension FavoritesViewController: UICollectionViewDataSource {
     }
 }
 
-// MARK: - Delegate
-
 extension FavoritesViewController: UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 
-        // Собираем массив фото из избранного (чтобы можно было свайпать в деталях)
         let photos: [Photo] = (0..<viewModel.numberOfItems).compactMap { index in
             guard let item = viewModel.item(at: index) else { return nil }
 
@@ -128,7 +123,7 @@ extension FavoritesViewController: UICollectionViewDelegate {
                     thumb: item.thumbURL ?? ""
                 ),
                 user: PhotoUser(
-                    name: item.authorName ?? "Unknown",
+                    name: item.authorName ?? L10n.unknownAuthor,
                     username: ""
                 ),
                 description: item.photoDescription,
@@ -147,8 +142,6 @@ extension FavoritesViewController: UICollectionViewDelegate {
         navigationController?.pushViewController(detailVC, animated: true)
     }
 }
-
-// MARK: - Layout
 
 extension FavoritesViewController: UICollectionViewDelegateFlowLayout {
 
