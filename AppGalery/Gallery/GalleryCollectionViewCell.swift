@@ -8,8 +8,14 @@
 import UIKit
 
 final class GalleryCollectionViewCell: UICollectionViewCell {
+
     static let identifier = "GalleryCollectionViewCell"
-    
+
+    private enum Constants {
+        static let heartInset: CGFloat = 8
+        static let heartSize: CGFloat = 20
+    }
+
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -18,7 +24,7 @@ final class GalleryCollectionViewCell: UICollectionViewCell {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
-    
+
     private let favoriteIndicator: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "heart.fill")
@@ -27,9 +33,10 @@ final class GalleryCollectionViewCell: UICollectionViewCell {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
+
         contentView.addSubview(imageView)
         contentView.addSubview(favoriteIndicator)
 
@@ -39,39 +46,41 @@ final class GalleryCollectionViewCell: UICollectionViewCell {
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 
-            favoriteIndicator.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            favoriteIndicator.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-            favoriteIndicator.widthAnchor.constraint(equalToConstant: 20),
-            favoriteIndicator.heightAnchor.constraint(equalToConstant: 20)
+            favoriteIndicator.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constants.heartInset),
+            favoriteIndicator.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constants.heartInset),
+            favoriteIndicator.widthAnchor.constraint(equalToConstant: Constants.heartSize),
+            favoriteIndicator.heightAnchor.constraint(equalToConstant: Constants.heartSize)
         ])
     }
-    
-    required init?(coder: NSCoder) { fatalError() }
-    
-    func configure(with photo: Photo, isFavorite: Bool) {
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func configure(with photo: Photo, isFavorite: Bool, imageLoader: ImageLoaderProtocol) {
         favoriteIndicator.isHidden = !isFavorite
+
         if let url = URL(string: photo.urls.thumb) {
-            imageView.loadImage(from: url)
+            imageLoader.load(url: url, into: imageView)
+        } else {
+            imageView.image = nil
         }
     }
-    
-    func updateFavorite(isFavorite: Bool) {
-        favoriteIndicator.isHidden = !isFavorite
-        
-        if isFavorite {
-            UIView.animate(withDuration: 0.2, animations: {
-                self.favoriteIndicator.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
-            }) { _ in
-                UIView.animate(withDuration: 0.2) {
-                    self.favoriteIndicator.transform = .identity
-                }
-            }
+
+    func configure(with item: FavoritePhotoItem, imageLoader: ImageLoaderProtocol) {
+        favoriteIndicator.isHidden = false
+
+        if let urlString = item.thumbURL, let url = URL(string: urlString) {
+            imageLoader.load(url: url, into: imageView)
+        } else {
+            imageView.image = nil
         }
     }
-    
+
     override func prepareForReuse() {
         super.prepareForReuse()
         imageView.image = nil
         favoriteIndicator.isHidden = true
+        favoriteIndicator.transform = .identity
     }
 }

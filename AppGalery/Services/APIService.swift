@@ -7,28 +7,21 @@
 
 import Foundation
 
-enum PhotoError: Error {
-    case invalidURL
-    case missingAccessKey
-    case network
-    case unauthorized
-    case rateLimited
-    case decoding
-}
+final class APIService: APIServiceProtocol {
 
-final class APIService {
+    private let session: URLSession
 
-    private let session: URLSession = .shared
+    private enum Constants {
+        static let perPage = 30
+    }
+
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
 
     private var accessKey: String? {
-        let value = Bundle.main.object(
-            forInfoDictionaryKey: "UNSPLASH_ACCESS_KEY"
-        ) as? String
-
-        let trimmed = value?.trimmingCharacters(
-            in: .whitespacesAndNewlines
-        )
-
+        let value = Bundle.main.object(forInfoDictionaryKey: "UNSPLASH_ACCESS_KEY") as? String
+        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines)
         return (trimmed?.isEmpty == false) ? trimmed : nil
     }
 
@@ -48,29 +41,17 @@ final class APIService {
 
         session.dataTask(with: request) { [weak self] data, response, error in
             guard let self else { return }
-
-            let result = self.handleResponse(
-                data: data,
-                response: response,
-                error: error
-            )
-
-            completion(result)
+            completion(self.handleResponse(data: data, response: response, error: error))
         }.resume()
     }
 
     private func buildRequest(page: Int, accessKey: String) -> URLRequest? {
-        guard let url = URL(
-            string: "https://api.unsplash.com/photos?page=\(page)&per_page=30"
-        ) else {
+        guard let url = URL(string: "https://api.unsplash.com/photos?page=\(page)&per_page=\(Constants.perPage)") else {
             return nil
         }
 
         var request = URLRequest(url: url)
-        request.setValue(
-            "Client-ID \(accessKey)",
-            forHTTPHeaderField: "Authorization"
-        )
+        request.setValue("Client-ID \(accessKey)", forHTTPHeaderField: "Authorization")
         return request
     }
 
@@ -79,12 +60,9 @@ final class APIService {
         response: URLResponse?,
         error: Error?
     ) -> Result<[Photo], PhotoError> {
-        if error != nil {
-            return .failure(.network)
-        }
-        guard let http = response as? HTTPURLResponse else {
-            return .failure(.network)
-        }
+        if error != nil { return .failure(.network) }
+        guard let http = response as? HTTPURLResponse else { return .failure(.network) }
+
         switch http.statusCode {
         case 200...299:
             break
@@ -96,21 +74,14 @@ final class APIService {
             return .failure(.network)
         }
 
-        guard let data else {
-            return .failure(.network)
-        }
+        guard let data else { return .failure(.network) }
         return decode(data)
     }
 
     private func decode(_ data: Data) -> Result<[Photo], PhotoError> {
         do {
-            let dto = try JSONDecoder().decode(
-                [UnsplashPhotoDTO].self,
-                from: data
-            )
-
+            let dto = try JSONDecoder().decode([UnsplashPhotoDTO].self, from: data)
             let photos = dto.map(mapToDomain)
-
             return .success(photos)
         } catch {
             return .failure(.decoding)

@@ -1,0 +1,19 @@
+"gallery.title" = "Галерея";
+"favorites.title" = "Избранное";
+"details.title" = "Детали";
+
+"error.title" = "Ошибка загрузки";
+"error.defaultMessage" = "Не удалось загрузить данные";
+"error.retry" = "Повторить";
+
+"details.authorLine" = "Автор: %@ • %@";
+"details.noTitle" = "Без названия";
+"details.noDescription" = "Нет описания";
+"details.unknownDate" = "Дата неизвестна";
+
+"error.missingKey" = "Не найден UNSPLASH_ACCESS_KEY. Добавь ключ в Info.plist (см. README).";
+"error.unauthorized" = "Ключ Unsplash неверный или нет доступа (401/403). Проверь UNSPLASH_ACCESS_KEY.";
+"error.rateLimited" = "Слишком много запросов (429). Попробуй чуть позже.";
+"error.invalidURL" = "Ошибка формирования запроса.";
+"error.network" = "Проблема с сетью. Проверь интернет и попробуй снова.";
+"error.decoding" = "Не удалось обработать ответ сервера.";

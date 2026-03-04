@@ -9,33 +9,25 @@ import Foundation
 
 @MainActor
 final class FavoritesViewModel {
-    
-    private var allPhotos: [Photo] = []
-    private var favoritePhotos: [Photo] = []
-    private let favoritesManager = FavoritesManager.shared
-    
+
+    private let favoritesStore: FavoritesProtocol
+    private var items: [FavoritePhotoItem] = []
+
     var didUpdate: (() -> Void)?
-    
-    var numberOfItems: Int { favoritePhotos.count }
-    
-    func photo(at index: Int) -> Photo? {
-        guard index >= 0 && index < favoritePhotos.count else { return nil }
-        return favoritePhotos[index]
+
+    init(favoritesStore: FavoritesProtocol) {
+        self.favoritesStore = favoritesStore
     }
-    
-    func isFavorite(photoId: String) -> Bool {
-        favoritesManager.isFavorite(photoId)
+
+    var numberOfItems: Int { items.count }
+
+    func item(at index: Int) -> FavoritePhotoItem? {
+        guard items.indices.contains(index) else { return nil }
+        return items[index]
     }
-    
-    func toggleFavorite(photoId: String) {
-        favoritesManager.toggleFavorite(photoId)
-        loadFavorites(from: allPhotos)
-    }
-    
-    func loadFavorites(from photos: [Photo]) {
-        allPhotos = photos
-        let favoriteIds = favoritesManager.favoriteIds()
-        favoritePhotos = allPhotos.filter { favoriteIds.contains($0.id) }
+
+    func reload() {
+        items = favoritesStore.fetchAll()
         didUpdate?()
     }
 }

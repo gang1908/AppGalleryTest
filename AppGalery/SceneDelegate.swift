@@ -11,46 +11,44 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let windowScene = (scene as? UIWindowScene) else { return }
-                
-        let window = UIWindow(windowScene: windowScene)
-        let galleryViewController = GalleryViewController()
-        let navigationController = UINavigationController(rootViewController: galleryViewController)
-                
+    func scene(
+        _ scene: UIScene,
+        willConnectTo session: UISceneSession,
+        options connectionOptions: UIScene.ConnectionOptions
+    ) {
+        guard let windowScene = scene as? UIWindowScene else { return }
+
+        let coreDataStack = CoreDataStack()
+        let favoritesStore = CoreDataFavoritesStore(
+            context: coreDataStack.context,
+            save: { coreDataStack.saveIfNeeded() }
+        )
+
+        let imageLoader = ImageLoader()
+        let apiService = APIService()
+
+        let galleryVM = GalleryViewModel(service: apiService, favoritesStore: favoritesStore)
+        let galleryVC = GalleryViewController(
+            viewModel: galleryVM,
+            favoritesStore: favoritesStore,
+            imageLoader: imageLoader
+        )
+
+        let navigationController = UINavigationController(rootViewController: galleryVC)
+
         let appearance = UINavigationBarAppearance()
-                appearance.configureWithOpaqueBackground()
-                appearance.backgroundColor = .systemBackground
-                appearance.titleTextAttributes = [.foregroundColor: UIColor.label]
-                appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
-                
-                navigationController.navigationBar.standardAppearance = appearance
-                navigationController.navigationBar.scrollEdgeAppearance = appearance
-                navigationController.navigationBar.prefersLargeTitles = true // Включаем большие заголовки
-                
-                window.rootViewController = navigationController
-                window.makeKeyAndVisible()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .systemBackground
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.label]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
 
-                self.window = window
-            }
+        navigationController.navigationBar.standardAppearance = appearance
+        navigationController.navigationBar.scrollEdgeAppearance = appearance
+        navigationController.navigationBar.prefersLargeTitles = true
 
-    func sceneDidDisconnect(_ scene: UIScene) {
-       
-    }
-
-    func sceneDidBecomeActive(_ scene: UIScene) {
-
-    }
-
-    func sceneWillResignActive(_ scene: UIScene) {
-        
-    }
-
-    func sceneWillEnterForeground(_ scene: UIScene) {
-       
-    }
-
-    func sceneDidEnterBackground(_ scene: UIScene) {
-        
+        let window = UIWindow(windowScene: windowScene)
+        window.rootViewController = navigationController
+        window.makeKeyAndVisible()
+        self.window = window
     }
 }

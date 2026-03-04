@@ -10,8 +10,8 @@ import Foundation
 @MainActor
 final class GalleryViewModel {
 
-    private let service = APIService()
-    private let favoritesManager = FavoritesManager.shared
+    private let service: APIServiceProtocol
+    private let favoritesStore: FavoritesProtocol
 
     private(set) var photos: [Photo] = []
 
@@ -22,52 +22,47 @@ final class GalleryViewModel {
     private var page = 1
     private var isLoading = false
 
+    init(service: APIServiceProtocol, favoritesStore: FavoritesProtocol) {
+        self.service = service
+        self.favoritesStore = favoritesStore
+    }
+
     var numberOfItems: Int { photos.count }
 
     func photo(at index: Int) -> Photo? {
-        guard index >= 0 && index < photos.count else { return nil }
+        guard photos.indices.contains(index) else { return nil }
         return photos[index]
     }
 
     func isFavorite(photoId: String) -> Bool {
-        favoritesManager.isFavorite(photoId)
+        favoritesStore.isFavorite(photoId)
+    }
+
+    func toggleFavorite(photo: Photo) {
+        favoritesStore.toggle(photo: photo)
+        didUpdate?()
     }
 
     func loadNextPage() {
         guard !isLoading else { return }
+
         isLoading = true
         didStartLoading?()
-        
+
         service.fetchPhotos(page: page) { [weak self] result in
             guard let self else { return }
-            
-            DispatchQueue.main.async {
+
+            Task { @MainActor in
                 self.isLoading = false
+
                 switch result {
                 case .success(let newPhotos):
                     self.photos.append(contentsOf: newPhotos)
                     self.page += 1
                     self.didUpdate?()
+
                 case .failure(let error):
-                    switch error {
-                    case .missingAccessKey:
-                        self.didFail?("Не найден UNSPLASH_ACCESS_KEY. Добавь ключ в Info.plist (см. README).")
-                        
-                    case .unauthorized:
-                        self.didFail?("Ключ Unsplash неверный или нет доступа (401/403). Проверь UNSPLASH_ACCESS_KEY в Info.plist.")
-                        
-                    case .rateLimited:
-                        self.didFail?("Слишком много запросов (429). Попробуй чуть позже.")
-                        
-                    case .invalidURL:
-                        self.didFail?("Ошибка формирования запроса. Попробуй перезапустить приложение.")
-                        
-                    case .decoding:
-                        self.didFail?("Не удалось обработать ответ сервера.")
-                        
-                    case .network:
-                        self.didFail?("Проблема с сетью. Проверь интернет и попробуй снова.")
-                    }
+                    self.didFail?(error.localizedDescription)
                 }
             }
         }

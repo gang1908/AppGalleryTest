@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ErrorView: UIView {
+final class ErrorView: UIView {
 
     private let stackView: UIStackView = {
         let stackView = UIStackView()
@@ -87,7 +87,10 @@ class ErrorView: UIView {
             stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32),
             
             imageView.widthAnchor.constraint(equalToConstant: 60),
-            imageView.heightAnchor.constraint(equalToConstant: 60)
+            imageView.heightAnchor.constraint(equalToConstant: 60),
+            
+            retryButton.heightAnchor.constraint(equalToConstant: 44),
+            retryButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 140)
         ])
         
         retryButton.addTarget(self, action: #selector(retryTapped), for: .touchUpInside)
